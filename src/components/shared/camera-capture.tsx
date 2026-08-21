@@ -17,8 +17,10 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
 
   const [mode, setMode] = useState<"idle" | "starting" | "preview" | "captured" | "error">("idle");
   const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
+  const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [confirming, setConfirming] = useState(false);
 
   const stopStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -66,6 +68,7 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
 
     setError(null);
     stopStream();
+    setCapturedBlob(null);
     setMode("starting");
 
     if (typeof window !== "undefined" && !window.isSecureContext) {
@@ -173,6 +176,7 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
       (blob) => {
         if (!blob) return;
         const url = URL.createObjectURL(blob);
+        setCapturedBlob(blob);
         setCapturedUrl(url);
         setMode("captured");
       },
@@ -182,20 +186,21 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
   }, [facingMode, stopStream]);
 
   const confirmPhoto = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.toBlob(
-      (blob) => {
-        if (blob) onCapture(blob);
-      },
-      "image/jpeg",
-      0.85
-    );
-  }, [onCapture]);
+    if (!capturedBlob || confirming) return;
+    setConfirming(true);
+    try {
+      onCapture(capturedBlob);
+    } finally {
+      // Parent may navigate away; reset if still mounted
+      setConfirming(false);
+    }
+  }, [capturedBlob, confirming, onCapture]);
 
   const retake = useCallback(() => {
     if (capturedUrl) URL.revokeObjectURL(capturedUrl);
     setCapturedUrl(null);
+    setCapturedBlob(null);
+    setConfirming(false);
     startCamera();
   }, [capturedUrl, startCamera]);
 
@@ -247,12 +252,12 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
         />
         <p className="text-sm text-muted">Confirm this photo or retake</p>
         <div className="flex gap-3 w-full max-w-sm">
-          <Button variant="outline" onClick={retake} className="flex-1">
+          <Button variant="outline" onClick={retake} className="flex-1" disabled={confirming}>
             <RotateCcw className="h-4 w-4" />
             Retake
           </Button>
-          <Button onClick={confirmPhoto} className="flex-1">
-            <Check className="h-4 w-4" />
+          <Button onClick={confirmPhoto} className="flex-1" disabled={!capturedBlob || confirming}>
+            {confirming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
             Confirm
           </Button>
         </div>
