@@ -199,6 +199,12 @@ export function PublicHeader() {
         </Link>
         <div className="flex items-center gap-3">
           <Link
+            href="/status"
+            className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/12 transition-colors"
+          >
+            Check status
+          </Link>
+          <Link
             href="/borrow"
             className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-[#0D2B66] hover:bg-accent-strong transition-colors"
           >

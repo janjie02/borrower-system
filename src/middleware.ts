@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = [
   "/reset-password",
   "/borrow",
   "/setup",
+  "/status",
 ];
 
 const PUBLIC_PREFIXES = [

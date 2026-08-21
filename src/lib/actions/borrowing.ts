@@ -34,6 +34,95 @@ async function generateRequestNumber(): Promise<string> {
   return data as string;
 }
 
+function formatItemLines(
+  items: { quantity: number; inventory?: { name?: string } | null; inventory_id?: string }[],
+  nameMap?: Map<string, string>
+): string[] {
+  return items.map((item) => {
+    const name =
+      item.inventory?.name ??
+      (item.inventory_id ? nameMap?.get(item.inventory_id) : undefined) ??
+      "Item";
+    return `${name} × ${item.quantity}`;
+  });
+}
+
+export async function getTransactionPhotoUrl(path: string | null): Promise<string | null> {
+  if (!path) return null;
+  await requireStaffOrAbove();
+  const supabase = createAdminClient();
+  const { data } = await supabase.storage
+    .from("transaction-photos")
+    .createSignedUrl(path, 3600);
+  return data?.signedUrl ?? null;
+}
+
+export async function lookupBorrowRequestByNumber(requestNumber: string) {
+  const cleaned = requestNumber.trim().toUpperCase();
+  if (!cleaned) return { error: "Enter a request number" };
+
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("borrow_requests")
+    .select(
+      `request_number, status, borrow_date, due_date, is_guest, created_at, notes, rejection_reason,
+       borrow_request_items(quantity, inventory(name, sku)),
+       guest_profiles(full_name, email, phone, id_code, account_type, year, section),
+       profiles!borrower_id(full_name, email)`
+    )
+    .ilike("request_number", cleaned)
+    .maybeSingle();
+
+  if (error) return { error: "Unable to look up that request" };
+  if (!data) return { error: "No request found with that reference number" };
+
+  const guestRaw = data.guest_profiles as unknown;
+  const profileRaw = data.profiles as unknown;
+  const guest = (Array.isArray(guestRaw) ? guestRaw[0] : guestRaw) as {
+    full_name: string;
+    email: string;
+    phone: string;
+    id_code: string;
+    account_type: string;
+    year?: string | null;
+    section?: string | null;
+  } | null;
+  const profile = (Array.isArray(profileRaw) ? profileRaw[0] : profileRaw) as {
+    full_name: string;
+    email: string;
+  } | null;
+
+  const rawItems = (data.borrow_request_items as unknown as {
+    quantity: number;
+    inventory: { name: string; sku: string } | { name: string; sku: string }[] | null;
+  }[]) ?? [];
+
+  return {
+    data: {
+      requestNumber: data.request_number as string,
+      status: data.status as string,
+      borrowDate: data.borrow_date as string | null,
+      dueDate: data.due_date as string | null,
+      isGuest: data.is_guest as boolean,
+      createdAt: data.created_at as string,
+      notes: data.notes as string | null,
+      rejectionReason: data.rejection_reason as string | null,
+      borrowerName: guest?.full_name ?? profile?.full_name ?? "Borrower",
+      borrowerEmail: guest?.email ?? profile?.email ?? null,
+      guestPhone: guest?.phone ?? null,
+      guestIdCode: guest?.id_code ?? null,
+      items: rawItems.map((item) => {
+        const inv = Array.isArray(item.inventory) ? item.inventory[0] : item.inventory;
+        return {
+          name: inv?.name ?? "Item",
+          sku: inv?.sku ?? "",
+          quantity: item.quantity,
+        };
+      }),
+    },
+  };
+}
+
 export async function submitBorrowRequest(params: {
   items: { inventoryId: string; quantity: number }[];
   photoBase64: string;
@@ -139,7 +228,19 @@ export async function submitBorrowRequest(params: {
       ? params.guestInfo.email
       : (await supabase.from("profiles").select("email").eq("id", borrowerId!).single()).data?.email;
 
-  if (email) await sendBorrowRequestSubmittedEmail(email, requestNumber);
+  const { data: invRows } = await supabase
+    .from("inventory")
+    .select("id, name")
+    .in(
+      "id",
+      params.items.map((i) => i.inventoryId)
+    );
+  const nameMap = new Map((invRows ?? []).map((r) => [r.id as string, r.name as string]));
+  const itemLines = params.items.map(
+    (i) => `${nameMap.get(i.inventoryId) ?? "Item"} × ${i.quantity}`
+  );
+
+  if (email) await sendBorrowRequestSubmittedEmail(email, requestNumber, itemLines);
 
   await logActivity({
     actorId: borrowerId,
@@ -162,7 +263,7 @@ export async function approveBorrowRequest(
 
   const { data: request } = await supabase
     .from("borrow_requests")
-    .select("*, borrow_request_items(*)")
+    .select("*, borrow_request_items(*, inventory(name))")
     .eq("id", requestId)
     .single();
 
@@ -241,7 +342,8 @@ export async function approveBorrowRequest(
   }
 
   if (email) {
-    await sendBorrowRequestApprovedEmail(email, request.request_number, dueDate);
+    const itemLines = formatItemLines(request.borrow_request_items ?? []);
+    await sendBorrowRequestApprovedEmail(email, request.request_number, dueDate, itemLines);
   }
 
   await logActivity({
@@ -261,7 +363,7 @@ export async function rejectBorrowRequest(requestId: string, reason?: string) {
 
   const { data: request } = await supabase
     .from("borrow_requests")
-    .select("*")
+    .select("*, borrow_request_items(*, inventory(name))")
     .eq("id", requestId)
     .single();
 
@@ -296,7 +398,10 @@ export async function rejectBorrowRequest(requestId: string, reason?: string) {
     email = g?.email;
   }
 
-  if (email) await sendBorrowRequestRejectedEmail(email, request.request_number, reason);
+  if (email) {
+    const itemLines = formatItemLines(request.borrow_request_items ?? []);
+    await sendBorrowRequestRejectedEmail(email, request.request_number, reason, itemLines);
+  }
 
   await logActivity({
     actorId: staff.id,

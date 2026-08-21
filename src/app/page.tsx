@@ -47,12 +47,20 @@ export default function HomePage() {
               {APP_NAME}
             </span>
           </Link>
-          <Link
-            href="/login"
-            className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15"
-          >
-            Login
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/status"
+              className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15"
+            >
+              Check status
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15"
+            >
+              Login
+            </Link>
+          </div>
         </div>
       </header>
 

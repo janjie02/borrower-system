@@ -184,13 +184,22 @@ function GuestBorrowFlow() {
             </p>
           )}
           <p className="mt-2 text-sm text-muted max-w-sm">
-            Check your email for confirmation. A staff member will review your
+            We emailed your reference number and items. Staff will review your
             request shortly.
           </p>
         </div>
-        <Button asChild size="lg">
-          <Link href="/">Back to Home</Link>
-        </Button>
+        <div className="flex w-full max-w-xs flex-col gap-3">
+          {requestNumber && (
+            <Button asChild size="lg" variant="secondary">
+              <Link href={`/status?ref=${encodeURIComponent(requestNumber)}`}>
+                Check status
+              </Link>
+            </Button>
+          )}
+          <Button asChild size="lg">
+            <Link href="/">Back to Home</Link>
+          </Button>
+        </div>
       </div>
     );
   }

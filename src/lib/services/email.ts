@@ -33,7 +33,7 @@ function baseTemplate(content: string): string {
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-    <div style="background:#1565C0;padding:24px;text-align:center;">
+    <div style="background:#0D47A1;padding:24px;text-align:center;">
       <h1 style="color:#fff;margin:0;font-size:22px;">Borrowing Management System</h1>
     </div>
     <div style="padding:32px 24px;">${content}</div>
@@ -46,7 +46,26 @@ function baseTemplate(content: string): string {
 }
 
 function button(url: string, label: string): string {
-  return `<a href="${url}" style="display:inline-block;background:#1565C0;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;margin:16px 0;">${label}</a>`;
+  return `<a href="${url}" style="display:inline-block;background:#FBC02D;color:#0D2B66;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;margin:16px 0;">${label}</a>`;
+}
+
+function itemsListHtml(items: string[]): string {
+  if (!items.length) return "<p>No items listed.</p>";
+  return `<ul style="padding-left:20px;margin:12px 0;">${items
+    .map((item) => `<li style="margin:4px 0;">${item}</li>`)
+    .join("")}</ul>`;
+}
+
+function referenceBlock(requestNumber: string): string {
+  const statusUrl = `${APP_URL}/status?ref=${encodeURIComponent(requestNumber)}`;
+  return `
+    <div style="background:#E3F2FD;border-radius:8px;padding:16px;margin:16px 0;text-align:center;">
+      <p style="margin:0 0 6px;font-size:13px;color:#6B7280;">Your reference number</p>
+      <p style="margin:0;font-size:22px;font-weight:bold;color:#0D47A1;letter-spacing:1px;">${requestNumber}</p>
+    </div>
+    <p style="font-size:13px;color:#6B7280;">Track this request anytime:</p>
+    ${button(statusUrl, "Check Request Status")}
+  `;
 }
 
 export async function sendInvitationEmail(
@@ -63,7 +82,7 @@ export async function sendInvitationEmail(
     to: email,
     subject: `You're invited to register as ${roleLabel}`,
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Registration Invitation</h2>
+      <h2 style="color:#0D47A1;">Registration Invitation</h2>
       <p>You have been invited to create a <strong>${roleLabel}</strong> account on the Borrowing Management System.</p>
       <p>Click the button below to complete your registration. This link is single-use and expires on <strong>${expiresAt.toLocaleString()}</strong>.</p>
       ${button(url, "Complete Registration")}
@@ -74,15 +93,19 @@ export async function sendInvitationEmail(
 
 export async function sendBorrowRequestSubmittedEmail(
   email: string,
-  requestNumber: string
+  requestNumber: string,
+  items: string[] = []
 ): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: `Borrow Request Submitted — ${requestNumber}`,
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Request Submitted</h2>
-      <p>Your borrowing request <strong>${requestNumber}</strong> has been submitted and is pending approval.</p>
-      <p>You will receive another email once your request has been reviewed.</p>
+      <h2 style="color:#0D47A1;">Request Submitted</h2>
+      <p>Your borrowing request has been submitted and is <strong>pending approval</strong>.</p>
+      ${referenceBlock(requestNumber)}
+      <p><strong>Items requested:</strong></p>
+      ${itemsListHtml(items)}
+      <p>You will receive another email once staff review your request.</p>
     `),
   });
 }
@@ -90,15 +113,19 @@ export async function sendBorrowRequestSubmittedEmail(
 export async function sendBorrowRequestApprovedEmail(
   email: string,
   requestNumber: string,
-  dueDate: string
+  dueDate: string,
+  items: string[] = []
 ): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: `Request Approved — ${requestNumber}`,
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Request Approved</h2>
-      <p>Your borrowing request <strong>${requestNumber}</strong> has been approved.</p>
+      <h2 style="color:#0D47A1;">Request Approved</h2>
+      <p>Your borrowing request has been <strong>approved</strong>.</p>
+      ${referenceBlock(requestNumber)}
       <p>Please return all items by <strong>${dueDate}</strong>.</p>
+      <p><strong>Items:</strong></p>
+      ${itemsListHtml(items)}
     `),
   });
 }
@@ -106,15 +133,19 @@ export async function sendBorrowRequestApprovedEmail(
 export async function sendBorrowRequestRejectedEmail(
   email: string,
   requestNumber: string,
-  reason?: string
+  reason?: string,
+  items: string[] = []
 ): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: `Request Rejected — ${requestNumber}`,
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Request Rejected</h2>
-      <p>Your borrowing request <strong>${requestNumber}</strong> has been rejected.</p>
+      <h2 style="color:#0D47A1;">Request Rejected</h2>
+      <p>Your borrowing request has been <strong>rejected</strong>.</p>
+      ${referenceBlock(requestNumber)}
       ${reason ? `<p>Reason: ${reason}</p>` : ""}
+      <p><strong>Items:</strong></p>
+      ${itemsListHtml(items)}
     `),
   });
 }
@@ -131,7 +162,7 @@ export async function sendDueSoonEmail(
     html: baseTemplate(`
       <h2 style="color:#FBC02D;">Items Due Soon</h2>
       <p>Your borrowed items are due on <strong>${dueDate}</strong>.</p>
-      <p>Request: <strong>${requestNumber}</strong></p>
+      ${referenceBlock(requestNumber)}
       <p>Items: ${items}</p>
       <p>Please return them on time to maintain your credit score.</p>
     `),
@@ -150,7 +181,7 @@ export async function sendOverdueEmail(
     html: baseTemplate(`
       <h2 style="color:#DC2626;">Items Overdue</h2>
       <p>Your borrowed items are <strong>${daysOverdue} day${daysOverdue > 1 ? "s" : ""} overdue</strong>.</p>
-      <p>Request: <strong>${requestNumber}</strong></p>
+      ${referenceBlock(requestNumber)}
       <p>Items: ${items}</p>
       <p>Please return them as soon as possible to avoid further credit penalties.</p>
     `),
@@ -171,7 +202,7 @@ export async function sendReturnConfirmationEmail(
     to: email,
     subject: `Return Confirmed — ${requestNumber}`,
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Return Confirmed</h2>
+      <h2 style="color:#0D47A1;">Return Confirmed</h2>
       <p>Your return for request <strong>${requestNumber}</strong> has been processed.</p>
       <p>Items: ${items}</p>
       ${creditMsg}
@@ -187,7 +218,7 @@ export async function sendPasswordResetEmail(
     to: email,
     subject: "Reset Your Password",
     html: baseTemplate(`
-      <h2 style="color:#1565C0;">Password Reset</h2>
+      <h2 style="color:#0D47A1;">Password Reset</h2>
       <p>Click the button below to reset your password. This link expires in 1 hour.</p>
       ${button(resetUrl, "Reset Password")}
       <p style="font-size:13px;color:#6B7280;">If you did not request this, ignore this email.</p>

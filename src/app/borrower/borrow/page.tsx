@@ -117,10 +117,18 @@ export default function BorrowerBorrowPage() {
             </p>
           )}
           <p className="mt-2 text-sm text-muted">
-            You&apos;ll receive an email once your request is reviewed.
+            We emailed your reference number and items. You&apos;ll get another
+            email once staff review your request.
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
+          {requestNumber && (
+            <Button asChild size="lg" variant="secondary">
+              <Link href={`/status?ref=${encodeURIComponent(requestNumber)}`}>
+                Check status
+              </Link>
+            </Button>
+          )}
           <Button asChild size="lg">
             <Link href="/borrower/history">View History</Link>
           </Button>
