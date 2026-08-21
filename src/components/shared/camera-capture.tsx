@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, RotateCcw, Check, AlertCircle } from "lucide-react";
+import { Camera, RotateCcw, Check, AlertCircle, Loader2 } from "lucide-react";
 
 interface CameraCaptureProps {
   onCapture: (blob: Blob) => void;
@@ -15,7 +15,7 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const [mode, setMode] = useState<"idle" | "preview" | "captured" | "error">("idle");
+  const [mode, setMode] = useState<"idle" | "starting" | "preview" | "captured" | "error">("idle");
   const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
@@ -23,38 +23,122 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
   const stopStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   }, []);
 
-  const startCamera = useCallback(async () => {
+  const attachStreamToVideo = useCallback(async (stream: MediaStream) => {
+    const video = videoRef.current;
+    if (!video) return false;
+
+    video.setAttribute("playsinline", "true");
+    video.setAttribute("webkit-playsinline", "true");
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+
+    await new Promise<void>((resolve) => {
+      if (video.readyState >= 1) {
+        resolve();
+        return;
+      }
+      const onReady = () => {
+        video.removeEventListener("loadedmetadata", onReady);
+        resolve();
+      };
+      video.addEventListener("loadedmetadata", onReady);
+    });
+
+    try {
+      await video.play();
+    } catch {
+      // Some browsers need a second tick after metadata
+      await new Promise((r) => setTimeout(r, 100));
+      await video.play();
+    }
+    return true;
+  }, []);
+
+  const startCamera = useCallback(async (nextFacing?: "user" | "environment") => {
+    const facing = nextFacing ?? facingMode;
+    if (nextFacing) setFacingMode(nextFacing);
+
     setError(null);
     stopStream();
+    setMode("starting");
+
+    if (typeof window !== "undefined" && !window.isSecureContext) {
+      setError("Camera requires HTTPS. Open this page over https:// or use localhost.");
+      setMode("error");
+      return;
+    }
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      setError("Camera is not supported in this browser. Please use HTTPS and a modern browser.");
+      setError("Camera is not supported in this browser. Try Safari on iPhone, or Chrome on Android.");
       setMode("error");
       return;
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: facing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+        });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: true,
+        });
       }
+
+      streamRef.current = stream;
       setMode("preview");
     } catch (err) {
+      const name = err instanceof DOMException ? err.name : "";
       const msg =
-        err instanceof DOMException && err.name === "NotAllowedError"
-          ? "Camera permission denied. Please allow camera access and try again."
-          : "Unable to access camera. Ensure you are using HTTPS.";
+        name === "NotAllowedError"
+          ? "Camera permission denied. Allow camera access in your browser settings, then try again."
+          : name === "NotFoundError"
+            ? "No camera was found on this device."
+            : name === "NotReadableError"
+              ? "Camera is already in use by another app. Close it and try again."
+              : "Unable to access camera. Use HTTPS and allow camera permission.";
       setError(msg);
       setMode("error");
     }
   }, [facingMode, stopStream]);
+
+  // Attach stream AFTER the <video> is in the DOM (preview mode)
+  useEffect(() => {
+    if (mode !== "preview" || !streamRef.current) return;
+
+    let cancelled = false;
+    (async () => {
+      // Wait one frame so the video element is mounted
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      if (cancelled || !streamRef.current) return;
+      try {
+        await attachStreamToVideo(streamRef.current);
+      } catch {
+        if (!cancelled) {
+          setError("Camera opened but preview failed. Try again or switch camera.");
+          setMode("error");
+          stopStream();
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, attachStreamToVideo, stopStream]);
 
   useEffect(() => {
     return () => stopStream();
@@ -65,11 +149,24 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 480;
+    if (!width || !height) {
+      setError("Camera is still starting. Wait a moment, then try again.");
+      return;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.drawImage(video, 0, 0);
+
+    // Mirror selfie for front camera so it matches what users expect
+    if (facingMode === "user") {
+      ctx.translate(width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0, width, height);
     stopStream();
 
     canvas.toBlob(
@@ -82,7 +179,7 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
       "image/jpeg",
       0.85
     );
-  }, [stopStream]);
+  }, [facingMode, stopStream]);
 
   const confirmPhoto = useCallback(() => {
     const canvas = canvasRef.current;
@@ -111,7 +208,7 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
         <p className="text-center text-sm text-muted">
           A live photo is required for verification. Your camera will be used — no file uploads.
         </p>
-        <Button size="lg" onClick={startCamera} className="w-full max-w-xs">
+        <Button size="lg" onClick={() => startCamera()} className="w-full max-w-xs">
           <Camera className="h-5 w-5" />
           Open Camera
         </Button>
@@ -129,8 +226,12 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
       <div className="flex flex-col items-center gap-4 p-6">
         <AlertCircle className="h-10 w-10 text-red-400" />
         <p className="text-center text-sm text-red-300">{error}</p>
-        <Button onClick={startCamera}>Try Again</Button>
-        {onCancel && <Button variant="ghost" onClick={onCancel}>Cancel</Button>}
+        <Button onClick={() => startCamera()}>Try Again</Button>
+        {onCancel && (
+          <Button variant="ghost" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
       </div>
     );
   }
@@ -159,30 +260,41 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
     );
   }
 
+  // starting + preview: always keep <video> mounted so the stream can attach
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-full max-w-sm overflow-hidden rounded-xl bg-black">
         <video
           ref={videoRef}
           autoPlay
-          playsInline
           muted
-          className="w-full aspect-[4/3] object-cover"
+          playsInline
+          className={`w-full aspect-[4/3] object-cover bg-black ${
+            facingMode === "user" ? "scale-x-[-1]" : ""
+          }`}
         />
+        {mode === "starting" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70">
+            <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            <p className="text-sm text-white">Starting camera…</p>
+          </div>
+        )}
       </div>
       <canvas ref={canvasRef} className="hidden" />
-      <Button size="lg" onClick={takePhoto} className="w-full max-w-xs">
+      <Button
+        size="lg"
+        onClick={takePhoto}
+        disabled={mode !== "preview"}
+        className="w-full max-w-xs"
+      >
         <Camera className="h-5 w-5" />
         {label}
       </Button>
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => {
-          stopStream();
-          setFacingMode((f) => (f === "user" ? "environment" : "user"));
-          setMode("idle");
-        }}
+        disabled={mode === "starting"}
+        onClick={() => startCamera(facingMode === "user" ? "environment" : "user")}
       >
         Switch Camera
       </Button>
