@@ -14,12 +14,28 @@ interface EmailOptions {
 }
 
 async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> {
+  const recipient = to.trim().toLowerCase();
+  if (!recipient || !recipient.includes("@")) {
+    console.error("[Email] Invalid recipient:", to);
+    return false;
+  }
+
   if (!resend) {
-    console.warn("[Email] RESEND_API_KEY not configured. Would send:", { to, subject });
+    console.warn("[Email] RESEND_API_KEY not configured. Would send:", { to: recipient, subject });
     return false;
   }
   try {
-    await resend.emails.send({ from: FROM, to, subject, html });
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: recipient,
+      subject,
+      html,
+    });
+    if (error) {
+      console.error("[Email] Resend rejected send:", error);
+      return false;
+    }
+    console.info("[Email] Sent:", { to: recipient, subject, id: data?.id });
     return true;
   } catch (error) {
     console.error("[Email] Failed to send:", error);

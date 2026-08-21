@@ -167,14 +167,19 @@ export async function submitBorrowRequest(params: {
   let guestProfileId: string | null = null;
 
   if (params.isGuest && params.guestInfo) {
+    const guestEmail = params.guestInfo.email.trim().toLowerCase();
+    if (!guestEmail.includes("@")) {
+      return { error: "Please enter a valid email address" };
+    }
+
     const { data: guest, error: guestError } = await supabase
       .from("guest_profiles")
       .insert({
-        full_name: params.guestInfo.fullName,
+        full_name: params.guestInfo.fullName.trim(),
         account_type: params.guestInfo.accountType,
-        email: params.guestInfo.email,
-        phone: params.guestInfo.phone,
-        id_code: params.guestInfo.idCode,
+        email: guestEmail,
+        phone: params.guestInfo.phone.trim(),
+        id_code: params.guestInfo.idCode.trim(),
         year: params.guestInfo.accountType === "student" ? params.guestInfo.year : null,
         section: params.guestInfo.accountType === "student" ? params.guestInfo.section : null,
         photo_path: photoPath,
@@ -223,10 +228,23 @@ export async function submitBorrowRequest(params: {
     notes: "Request submitted",
   });
 
-  const email =
-    params.isGuest && params.guestInfo
-      ? params.guestInfo.email
-      : (await supabase.from("profiles").select("email").eq("id", borrowerId!).single()).data?.email;
+  let email: string | undefined;
+  if (params.isGuest && guestProfileId) {
+    // Always use the email the guest entered (saved on their guest profile)
+    const { data: guestRow } = await supabase
+      .from("guest_profiles")
+      .select("email")
+      .eq("id", guestProfileId)
+      .single();
+    email = guestRow?.email?.trim().toLowerCase() || params.guestInfo?.email.trim().toLowerCase();
+  } else if (borrowerId) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", borrowerId)
+      .single();
+    email = profile?.email?.trim().toLowerCase();
+  }
 
   const { data: invRows } = await supabase
     .from("inventory")
@@ -240,7 +258,10 @@ export async function submitBorrowRequest(params: {
     (i) => `${nameMap.get(i.inventoryId) ?? "Item"} × ${i.quantity}`
   );
 
-  if (email) await sendBorrowRequestSubmittedEmail(email, requestNumber, itemLines);
+  let emailSent = false;
+  if (email) {
+    emailSent = await sendBorrowRequestSubmittedEmail(email, requestNumber, itemLines);
+  }
 
   await logActivity({
     actorId: borrowerId,
@@ -248,9 +269,10 @@ export async function submitBorrowRequest(params: {
     action: ActivityActions.REQUEST_CREATED,
     targetType: "borrow_request",
     targetId: requestNumber,
+    metadata: { emailSent, emailedTo: email ?? null },
   });
 
-  return { success: true, requestNumber };
+  return { success: true, requestNumber, emailSent, emailedTo: email ?? null };
 }
 
 export async function approveBorrowRequest(

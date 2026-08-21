@@ -57,6 +57,8 @@ function GuestBorrowFlow() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [requestNumber, setRequestNumber] = useState<string | null>(null);
+  const [emailedTo, setEmailedTo] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const [guestInfo, setGuestInfo] = useState({
     fullName: "",
@@ -106,6 +108,10 @@ function GuestBorrowFlow() {
     }
     if (!guestInfo.email.trim()) {
       toast.error("Email is required");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestInfo.email.trim())) {
+      toast.error("Please enter a valid email address");
       return false;
     }
     if (!guestInfo.phone.trim()) {
@@ -162,8 +168,14 @@ function GuestBorrowFlow() {
 
       clearCart();
       setRequestNumber(result.requestNumber ?? null);
+      setEmailedTo(result.emailedTo ?? guestInfo.email.trim().toLowerCase());
+      setEmailSent(!!result.emailSent);
       setStep("success");
-      toast.success("Guest borrow request submitted!");
+      toast.success(
+        result.emailSent
+          ? `Request submitted — email sent to ${result.emailedTo}`
+          : "Request submitted — save your reference number"
+      );
     } catch {
       toast.error("Something went wrong. Please try again.");
       setStep("confirm");
@@ -184,8 +196,9 @@ function GuestBorrowFlow() {
             </p>
           )}
           <p className="mt-2 text-sm text-muted max-w-sm">
-            We emailed your reference number and items. Staff will review your
-            request shortly.
+            {emailSent && emailedTo
+              ? `We sent your reference number and item list to ${emailedTo}. Staff will review your request shortly.`
+              : "Save your reference number below. If email delivery failed, you can still check status anytime with this reference."}
           </p>
         </div>
         <div className="flex w-full max-w-xs flex-col gap-3">
