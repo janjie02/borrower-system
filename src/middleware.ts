@@ -25,11 +25,25 @@ function isPublicRoute(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Allow public routes through if Supabase is not configured yet
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (isPublicRoute(pathname)) {
+      return NextResponse.next();
+    }
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("error", "config");
+    return NextResponse.redirect(loginUrl);
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -49,7 +63,6 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
 
   if (isPublicRoute(pathname)) {
     if (user && (pathname === "/login" || pathname === "/")) {
