@@ -83,8 +83,8 @@ export default function BorrowerInventoryPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Browse Items</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-white">Browse Items</h1>
+          <p className="text-sm text-muted">
             {inventory.length} item{inventory.length !== 1 ? "s" : ""} available
           </p>
         </div>
@@ -98,14 +98,18 @@ export default function BorrowerInventoryPage() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {inventory.map((item) => {
           const qty = getCartQty(item.id);
           const inCart = qty > 0;
+          const soldOut = item.quantity_available <= 0;
 
           return (
-            <Card key={item.id} className="overflow-hidden">
-              <div className="aspect-[4/3] bg-[#E3F2FD] flex items-center justify-center">
+            <Card
+              key={item.id}
+              className="flex flex-col overflow-hidden transition-colors hover:border-white/20"
+            >
+              <div className="relative aspect-square bg-navy-950 flex items-center justify-center">
                 {item.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -114,72 +118,61 @@ export default function BorrowerInventoryPage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <Package className="h-12 w-12 text-[#1565C0]/40" />
+                  <Package className="h-10 w-10 text-accent/40" />
+                )}
+                {inCart && (
+                  <span className="absolute right-1.5 top-1.5 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-[#0D2B66] shadow">
+                    <Check className="h-3 w-3" />
+                    {qty}
+                  </span>
                 )}
               </div>
-              <CardContent className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-semibold text-[#1F2937] leading-tight">
+              <CardContent className="flex flex-1 flex-col gap-2 p-2.5">
+                <div className="flex-1">
+                  <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-white">
                     {item.name}
                   </h3>
-                  {item.inventory_categories?.name && (
-                    <p className="text-xs text-[#6B7280] mt-0.5">
-                      {item.inventory_categories.name}
-                    </p>
-                  )}
-                  <p className="text-xs text-[#1565C0] font-mono mt-1">
+                  <p className="mt-0.5 truncate font-mono text-[11px] text-accent">
                     {item.sku}
                   </p>
+                  <p className="mt-1 text-[11px] text-muted">
+                    {soldOut ? "Unavailable" : `${item.quantity_available} available`}
+                  </p>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-[#6B7280]">
-                    {item.quantity_available} available
-                  </span>
-                  {inCart ? (
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="h-10 w-10"
-                        onClick={() =>
-                          qty <= 1
-                            ? removeItem(item.id)
-                            : updateQuantity(item.id, qty - 1)
-                        }
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-6 text-center font-bold text-[#1565C0]">
-                        {qty}
-                      </span>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="h-10 w-10"
-                        disabled={qty >= item.quantity_available}
-                        onClick={() => updateQuantity(item.id, qty + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
+                {inCart ? (
+                  <div className="flex items-center justify-between rounded-lg bg-white/5 p-1">
                     <Button
-                      size="lg"
-                      onClick={() => handleAdd(item)}
-                      className="h-11 px-4"
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        qty <= 1 ? removeItem(item.id) : updateQuantity(item.id, qty - 1)
+                      }
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm font-bold text-accent">{qty}</span>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      disabled={qty >= item.quantity_available}
+                      onClick={() => updateQuantity(item.id, qty + 1)}
                     >
                       <Plus className="h-4 w-4" />
-                      Add
                     </Button>
-                  )}
-                </div>
-
-                {inCart && (
-                  <p className="flex items-center gap-1 text-xs text-green-600 font-medium">
-                    <Check className="h-3 w-3" />
-                    In cart
-                  </p>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={() => handleAdd(item)}
+                    disabled={soldOut}
+                    className="h-9 w-full"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add
+                  </Button>
                 )}
               </CardContent>
             </Card>

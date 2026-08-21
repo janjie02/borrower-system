@@ -93,12 +93,12 @@ export default function NewInventoryPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Add Inventory Item</h1>
-          <p className="text-sm text-[#6B7280]">Create a new item in the catalog</p>
+          <h1 className="text-2xl font-bold text-white">Add Inventory Item</h1>
+          <p className="text-sm text-muted">Create a new item in the catalog</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-[#E5E7EB] bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-white/10 bg-surface p-6">
         <Input
           label="Item Name"
           value={name}
@@ -108,14 +108,14 @@ export default function NewInventoryPage() {
         />
 
         <div className="space-y-1.5">
-          <label htmlFor="category" className="text-sm font-medium text-[#1F2937]">
+          <label htmlFor="category" className="text-sm font-medium text-white">
             Category
           </label>
           <select
             id="category"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="flex h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+            className="flex h-10 w-full rounded-lg border border-white/10 bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="">No category</option>
             {categories.map((cat) => (
@@ -153,18 +153,18 @@ export default function NewInventoryPage() {
           />
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-[#1F2937]">
+        <label className="flex items-center gap-2 text-sm text-white">
           <input
             type="checkbox"
             checked={trackIndividual}
             onChange={(e) => setTrackIndividual(e.target.checked)}
-            className="h-4 w-4 rounded border-[#E5E7EB] text-[#1565C0] focus:ring-[#1565C0]"
+            className="h-4 w-4 rounded border-white/10 text-accent focus:ring-accent"
           />
           Track individual units (each unit gets its own barcode)
         </label>
 
         <div className="space-y-1.5">
-          <label htmlFor="photo" className="text-sm font-medium text-[#1F2937]">
+          <label htmlFor="photo" className="text-sm font-medium text-white">
             Photo (optional)
           </label>
           <input
@@ -172,7 +172,7 @@ export default function NewInventoryPage() {
             type="file"
             accept="image/*"
             onChange={handlePhotoChange}
-            className="block w-full text-sm text-[#6B7280] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E3F2FD] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#1565C0]"
+            className="block w-full text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent-soft file:px-4 file:py-2 file:text-sm file:font-medium file:text-accent"
           />
         </div>
 

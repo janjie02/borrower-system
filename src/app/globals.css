@@ -1,35 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1F2937;
-  --primary: #1565C0;
+  /* Deep navy surfaces (dark theme) */
+  --navy-950: #06162F;
+  --navy-900: #0A2450;
+  --navy-800: #0E2E63;
+  --navy-700: #143A7A;
+  --navy-600: #1B4A93;
+
+  --background: #081F45;
+  --foreground: #FFFFFF;
+
+  --surface: #0E2E63;
+  --surface-2: #143A7A;
+  --hairline: rgba(255, 255, 255, 0.10);
+  --hairline-strong: rgba(255, 255, 255, 0.18);
+
+  --primary: #2F6FE0;
   --primary-dark: #0D47A1;
-  --primary-light: #E3F2FD;
+  --primary-light: #1B4A93;
+
   --accent: #FBC02D;
-  --accent-light: #FFF8D6;
-  --muted: #6B7280;
-  --border: #E5E7EB;
+  --accent-strong: #F9A825;
+  --accent-soft: rgba(251, 192, 45, 0.12);
+
+  --muted: #9DB8E3;
+  --muted-strong: #C4D6F2;
+  --border: rgba(255, 255, 255, 0.10);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
+
   --color-accent: var(--accent);
-  --color-accent-light: var(--accent-light);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+
   --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
   --color-border: var(--border);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reusable surface primitives */
+.app-bg {
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(47, 111, 224, 0.28), transparent 60%),
+    radial-gradient(800px 520px at 100% 0%, rgba(251, 192, 45, 0.10), transparent 55%),
+    var(--background);
+}
+
+.surface {
+  background-color: var(--surface);
+  border: 1px solid var(--hairline);
+}
+
+.surface-2 {
+  background-color: var(--surface-2);
+  border: 1px solid var(--hairline);
+}
+
+/* Subtle scrollbars for dark theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+/* Autofill fix so inputs stay dark */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-2) inset;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 @media print {

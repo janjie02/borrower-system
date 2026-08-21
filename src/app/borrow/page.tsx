@@ -173,17 +173,17 @@ function GuestBorrowFlow() {
   if (step === "success") {
     return (
       <div className="flex flex-col items-center gap-6 py-12 text-center">
-        <div className="rounded-full bg-green-100 p-6">
-          <CheckCircle className="h-12 w-12 text-green-600" />
+        <div className="rounded-full bg-emerald-400/15 p-6 ring-1 ring-emerald-400/30">
+          <CheckCircle className="h-12 w-12 text-emerald-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Request Submitted!</h1>
+          <h1 className="text-2xl font-bold text-white">Request Submitted!</h1>
           {requestNumber && (
-            <p className="mt-2 text-[#1565C0] font-mono font-semibold">
+            <p className="mt-2 text-accent font-mono font-semibold">
               #{requestNumber}
             </p>
           )}
-          <p className="mt-2 text-sm text-[#6B7280] max-w-sm">
+          <p className="mt-2 text-sm text-muted max-w-sm">
             Check your email for confirmation. A staff member will review your
             request shortly.
           </p>
@@ -199,7 +199,7 @@ function GuestBorrowFlow() {
     return (
       <div className="flex flex-col items-center gap-4 py-16">
         <LoadingSpinner size="lg" />
-        <p className="text-[#6B7280]">Submitting your request...</p>
+        <p className="text-muted">Submitting your request...</p>
       </div>
     );
   }
@@ -207,8 +207,8 @@ function GuestBorrowFlow() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Guest Borrowing</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-white">Guest Borrowing</h1>
+        <p className="text-sm text-muted">
           Borrow items without an account
         </p>
       </div>
@@ -222,20 +222,20 @@ function GuestBorrowFlow() {
               <div key={s.key} className="flex items-center gap-1 shrink-0">
                 <div
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                    active ? "bg-[#1565C0] text-white" : "bg-[#E5E7EB] text-[#6B7280]"
+                    active ? "bg-accent text-[#0D2B66]" : "bg-white/10 text-muted"
                   }`}
                 >
                   {i + 1}
                 </div>
                 <span
                   className={`text-xs font-medium mr-1 ${
-                    active ? "text-[#1565C0]" : "text-[#6B7280]"
+                    active ? "text-accent" : "text-muted"
                   }`}
                 >
                   {s.label}
                 </span>
                 {i < STEPS.length - 2 && (
-                  <ChevronRight className="h-3 w-3 text-[#E5E7EB]" />
+                  <ChevronRight className="h-3 w-3 text-white/20" />
                 )}
               </div>
             );
@@ -254,12 +254,16 @@ function GuestBorrowFlow() {
             />
           ) : (
             <>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {inventory.map((item) => {
                   const qty = getCartQty(item.id);
+                  const soldOut = item.quantity_available <= 0;
                   return (
-                    <Card key={item.id} className="overflow-hidden">
-                      <div className="aspect-[4/3] bg-[#E3F2FD] flex items-center justify-center">
+                    <Card
+                      key={item.id}
+                      className="flex flex-col overflow-hidden transition-colors hover:border-white/20"
+                    >
+                      <div className="relative aspect-square bg-navy-950 flex items-center justify-center">
                         {item.photoUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -268,24 +272,29 @@ function GuestBorrowFlow() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <Package className="h-10 w-10 text-[#1565C0]/40" />
+                          <Package className="h-10 w-10 text-white/25" />
+                        )}
+                        {qty > 0 && (
+                          <span className="absolute right-1.5 top-1.5 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-[#0D2B66] shadow">
+                            {qty}
+                          </span>
                         )}
                       </div>
-                      <CardContent className="p-4 space-y-3">
-                        <div>
-                          <h3 className="font-semibold text-[#1F2937]">
+                      <CardContent className="flex flex-1 flex-col gap-2 p-2.5">
+                        <div className="flex-1">
+                          <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-white">
                             {item.name}
                           </h3>
-                          <p className="text-xs text-[#6B7280]">
-                            {item.quantity_available} available
+                          <p className="mt-1 text-[11px] text-muted">
+                            {soldOut ? "Unavailable" : `${item.quantity_available} available`}
                           </p>
                         </div>
                         {qty > 0 ? (
-                          <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center justify-between rounded-lg bg-white/5 p-1">
                             <Button
                               size="icon"
-                              variant="outline"
-                              className="h-11 w-11"
+                              variant="ghost"
+                              className="h-8 w-8"
                               onClick={() =>
                                 qty <= 1
                                   ? removeItem(item.id)
@@ -294,11 +303,11 @@ function GuestBorrowFlow() {
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="font-bold text-[#1565C0]">{qty}</span>
+                            <span className="text-sm font-bold text-accent">{qty}</span>
                             <Button
                               size="icon"
-                              variant="outline"
-                              className="h-11 w-11"
+                              variant="ghost"
+                              className="h-8 w-8"
                               disabled={qty >= item.quantity_available}
                               onClick={() => updateQuantity(item.id, qty + 1)}
                             >
@@ -307,8 +316,9 @@ function GuestBorrowFlow() {
                           </div>
                         ) : (
                           <Button
-                            size="lg"
-                            className="w-full"
+                            size="sm"
+                            className="h-9 w-full"
+                            disabled={soldOut}
                             onClick={() => {
                               addItem({
                                 inventoryId: item.id,
@@ -323,7 +333,7 @@ function GuestBorrowFlow() {
                             }}
                           >
                             <Plus className="h-4 w-4" />
-                            Add to Cart
+                            Add
                           </Button>
                         )}
                       </CardContent>
@@ -367,15 +377,15 @@ function GuestBorrowFlow() {
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start gap-3">
                       <div>
-                        <h3 className="font-semibold">{item.name}</h3>
-                        <p className="text-xs text-[#6B7280] font-mono">
+                        <h3 className="font-semibold text-white">{item.name}</h3>
+                        <p className="text-xs text-muted font-mono">
                           {item.sku}
                         </p>
                       </div>
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="text-red-500"
+                        className="text-red-300 hover:text-red-200"
                         onClick={() => removeItem(item.inventoryId)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -394,7 +404,7 @@ function GuestBorrowFlow() {
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="font-bold text-[#1565C0]">
+                      <span className="font-bold text-accent">
                         {item.quantity}
                       </span>
                       <Button
@@ -435,7 +445,7 @@ function GuestBorrowFlow() {
       {step === "camera" && (
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-[#6B7280] mb-4 text-center">
+            <p className="text-sm text-muted mb-4 text-center">
               Take a live photo for identity verification.
             </p>
             <CameraCapture
@@ -454,14 +464,14 @@ function GuestBorrowFlow() {
             <img
               src={photoPreview}
               alt="Verification photo"
-              className="w-full max-w-xs mx-auto rounded-xl border-2 border-[#1565C0] object-cover aspect-[4/3]"
+              className="w-full max-w-xs mx-auto rounded-xl border-2 border-accent object-cover aspect-[4/3]"
             />
           )}
 
           <Card>
             <CardContent className="p-4 space-y-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <User className="h-4 w-4 text-[#1565C0]" />
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <User className="h-4 w-4 text-accent" />
                 Your Information
               </h3>
 
@@ -505,7 +515,7 @@ function GuestBorrowFlow() {
               />
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#1F2937]">
+                <label className="text-sm font-medium text-muted-strong">
                   Account Type
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -516,10 +526,10 @@ function GuestBorrowFlow() {
                       onClick={() =>
                         setGuestInfo({ ...guestInfo, accountType: type })
                       }
-                      className={`h-12 rounded-lg border-2 text-sm font-semibold capitalize transition-colors cursor-pointer ${
+                      className={`h-12 rounded-xl border-2 text-sm font-semibold capitalize transition-colors cursor-pointer ${
                         guestInfo.accountType === type
-                          ? "border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]"
-                          : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1565C0]/50"
+                          ? "border-accent bg-accent-soft text-accent"
+                          : "border-white/12 bg-surface-2 text-muted hover:border-white/25"
                       }`}
                     >
                       {type}
@@ -583,25 +593,25 @@ function GuestBorrowFlow() {
             <img
               src={photoPreview}
               alt="Verification photo"
-              className="w-full max-w-xs mx-auto rounded-xl border-2 border-[#1565C0] object-cover aspect-[4/3]"
+              className="w-full max-w-xs mx-auto rounded-xl border-2 border-accent object-cover aspect-[4/3]"
             />
           )}
 
           <Card>
             <CardContent className="p-4 space-y-2">
-              <h3 className="font-semibold text-[#1F2937]">Guest Details</h3>
-              <p className="text-sm">
-                <span className="text-[#6B7280]">Name:</span>{" "}
+              <h3 className="font-semibold text-white">Guest Details</h3>
+              <p className="text-sm text-muted-strong">
+                <span className="text-muted">Name:</span>{" "}
                 {guestInfo.fullName}
               </p>
-              <p className="text-sm">
-                <span className="text-[#6B7280]">Email:</span> {guestInfo.email}
+              <p className="text-sm text-muted-strong">
+                <span className="text-muted">Email:</span> {guestInfo.email}
               </p>
-              <p className="text-sm">
-                <span className="text-[#6B7280]">Phone:</span> {guestInfo.phone}
+              <p className="text-sm text-muted-strong">
+                <span className="text-muted">Phone:</span> {guestInfo.phone}
               </p>
-              <p className="text-sm capitalize">
-                <span className="text-[#6B7280]">Type:</span>{" "}
+              <p className="text-sm capitalize text-muted-strong">
+                <span className="text-muted">Type:</span>{" "}
                 {guestInfo.accountType}
               </p>
             </CardContent>
@@ -609,17 +619,17 @@ function GuestBorrowFlow() {
 
           <Card>
             <CardContent className="p-4 space-y-2">
-              <h3 className="font-semibold flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4 text-[#1565C0]" />
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-accent" />
                 Items ({totalItems})
               </h3>
               {items.map((item) => (
                 <div
                   key={item.inventoryId}
-                  className="flex justify-between text-sm"
+                  className="flex justify-between text-sm text-muted-strong"
                 >
                   <span>{item.name}</span>
-                  <span className="font-medium text-[#1565C0]">
+                  <span className="font-medium text-accent">
                     ×{item.quantity}
                   </span>
                 </div>
@@ -658,7 +668,7 @@ function GuestBorrowFlow() {
 export default function GuestBorrowPage() {
   return (
     <CartProvider>
-      <div className="min-h-screen bg-[#F9FAFB]">
+      <div className="min-h-screen app-bg">
         <PublicHeader />
         <main className="mx-auto max-w-4xl px-4 py-8">
           <GuestBorrowFlow />

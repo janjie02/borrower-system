@@ -227,44 +227,107 @@ export async function registerStaff(params: {
   return { success: true };
 }
 
+export async function validateSetupToken(token: string) {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("setup_tokens")
+      .select("expires_at, used_at")
+      .eq("token", token)
+      .single();
+
+    if (error || !data) return { valid: false, error: "Token not found in database" };
+    if (data.used_at) return { valid: false, error: "This token was already used" };
+    if (new Date(data.expires_at) < new Date()) return { valid: false, error: "Token expired — generate a new one in Supabase" };
+    return { valid: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { valid: false, error: `Cannot connect to Supabase: ${message}` };
+  }
+}
+
 export async function setupInitialAdmin(params: {
   token: string;
   email: string;
   password: string;
   fullName: string;
 }) {
-  const supabase = createAdminClient();
+  try {
+    const supabase = createAdminClient();
 
-  const { data: setupToken } = await supabase
-    .from("setup_tokens")
-    .select("*")
-    .eq("token", params.token)
-    .is("used_at", null)
-    .gt("expires_at", new Date().toISOString())
-    .single();
+    const { data: setupToken, error: tokenError } = await supabase
+      .from("setup_tokens")
+      .select("*")
+      .eq("token", params.token)
+      .is("used_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .single();
 
-  if (!setupToken) return { error: "Invalid or expired setup token" };
+    if (tokenError || !setupToken) {
+      return { error: "Invalid or expired setup token" };
+    }
 
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email: params.email,
-    password: params.password,
-    email_confirm: true,
-    user_metadata: { full_name: params.fullName, role: "admin" },
-  });
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: params.email,
+      password: params.password,
+      email_confirm: true,
+      user_metadata: { full_name: params.fullName },
+    });
 
-  if (authError) return { error: authError.message };
+    if (authError) {
+      // If user already exists from a previous attempt, promote them to admin
+      if (authError.message?.toLowerCase().includes("already")) {
+        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const existing = existingUsers?.users?.find(
+          (u) => u.email?.toLowerCase() === params.email.toLowerCase()
+        );
+        if (!existing) return { error: authError.message };
 
-  await supabase
-    .from("profiles")
-    .update({ role: "admin", account_status: "active", full_name: params.fullName })
-    .eq("id", authData.user.id);
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ role: "admin", account_status: "active", full_name: params.fullName })
+          .eq("id", existing.id);
 
-  await supabase
-    .from("setup_tokens")
-    .update({ used_at: new Date().toISOString(), used_by: authData.user.id })
-    .eq("token", params.token);
+        if (profileError) {
+          return { error: `Could not promote existing user: ${profileError.message}` };
+        }
 
-  return { success: true };
+        await supabase.auth.admin.updateUserById(existing.id, { password: params.password });
+        await supabase
+          .from("setup_tokens")
+          .update({ used_at: new Date().toISOString(), used_by: existing.id })
+          .eq("token", params.token);
+
+        return { success: true };
+      }
+      return { error: authError.message };
+    }
+
+    if (!authData?.user) {
+      return { error: "Account creation failed. Please try again." };
+    }
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ role: "admin", account_status: "active", full_name: params.fullName })
+      .eq("id", authData.user.id);
+
+    if (profileError) {
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      return { error: `Failed to set admin role: ${profileError.message}. Run the SQL fix in Supabase SQL Editor.` };
+    }
+
+    await supabase
+      .from("setup_tokens")
+      .update({ used_at: new Date().toISOString(), used_by: authData.user.id })
+      .eq("token", params.token);
+
+    return { success: true };
+  } catch (err) {
+    console.error("[setupInitialAdmin]", err);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { error: `Setup failed: ${message}` };
+  }
 }
 
 export async function loginAction(email: string, password: string) {

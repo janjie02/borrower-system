@@ -77,10 +77,10 @@ export default async function InventoryDetailPage({
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-[#1F2937]">{item.name}</h1>
+              <h1 className="text-2xl font-bold text-white">{item.name}</h1>
               <Badge status={item.status} />
             </div>
-            <p className="font-mono text-sm text-[#6B7280]">{item.sku}</p>
+            <p className="font-mono text-sm text-muted">{item.sku}</p>
           </div>
         </div>
         {isAdmin && item.status !== "archived" && <ArchiveButton id={id} />}
@@ -102,46 +102,46 @@ export default async function InventoryDetailPage({
             )}
             <dl className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <dt className="text-[#6B7280]">Category</dt>
+                <dt className="text-muted">Category</dt>
                 <dd className="font-medium">{item.inventory_categories?.name ?? "—"}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Barcode</dt>
+                <dt className="text-muted">Barcode</dt>
                 <dd className="font-mono">{item.barcode}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Total Quantity</dt>
+                <dt className="text-muted">Total Quantity</dt>
                 <dd className="font-medium">{item.quantity_total}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Available</dt>
-                <dd className="font-medium text-green-700">{item.quantity_available}</dd>
+                <dt className="text-muted">Available</dt>
+                <dd className="font-medium text-emerald-200">{item.quantity_available}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Borrowed</dt>
-                <dd className="font-medium text-[#1565C0]">{item.quantity_borrowed}</dd>
+                <dt className="text-muted">Borrowed</dt>
+                <dd className="font-medium text-accent">{item.quantity_borrowed}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Damaged</dt>
-                <dd className="font-medium text-orange-700">{item.quantity_damaged}</dd>
+                <dt className="text-muted">Damaged</dt>
+                <dd className="font-medium text-amber-200">{item.quantity_damaged}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Lost</dt>
-                <dd className="font-medium text-red-700">{item.quantity_lost}</dd>
+                <dt className="text-muted">Lost</dt>
+                <dd className="font-medium text-red-200">{item.quantity_lost}</dd>
               </div>
               <div>
-                <dt className="text-[#6B7280]">Track Individual</dt>
+                <dt className="text-muted">Track Individual</dt>
                 <dd className="font-medium">{item.track_individual ? "Yes" : "No"}</dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-[#6B7280]">Added</dt>
+                <dt className="text-muted">Added</dt>
                 <dd className="font-medium">{formatDate(item.created_at)}</dd>
               </div>
             </dl>
             {item.description && (
               <div>
-                <p className="text-sm text-[#6B7280]">Description</p>
-                <p className="mt-1 text-sm text-[#1F2937]">{item.description}</p>
+                <p className="text-sm text-muted">Description</p>
+                <p className="mt-1 text-sm text-white">{item.description}</p>
               </div>
             )}
           </CardContent>
@@ -159,12 +159,12 @@ export default async function InventoryDetailPage({
                 <div className="max-h-64 overflow-y-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#E5E7EB]">
-                        <th className="py-2 text-left text-[#6B7280]">SKU</th>
-                        <th className="py-2 text-left text-[#6B7280]">Status</th>
+                      <tr className="border-b border-white/10">
+                        <th className="py-2 text-left text-muted">SKU</th>
+                        <th className="py-2 text-left text-muted">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#E5E7EB]">
+                    <tbody className="divide-y divide-white/10">
                       {individualItems.map((unit) => (
                         <tr key={unit.id}>
                           <td className="py-2 font-mono text-xs">{unit.sku}</td>

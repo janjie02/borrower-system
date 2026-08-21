@@ -52,8 +52,8 @@ export default function AdminReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Reports</h1>
-        <p className="text-sm text-[#6B7280]">Export system data as CSV files</p>
+        <h1 className="text-2xl font-bold text-white">Reports</h1>
+        <p className="text-sm text-muted">Export system data as CSV files</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -61,7 +61,7 @@ export default function AdminReportsPage() {
           <Card key={report.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <FileText className="h-5 w-5 text-[#1565C0]" />
+                <FileText className="h-5 w-5 text-accent" />
                 {report.title}
               </CardTitle>
               <CardDescription>{report.description}</CardDescription>

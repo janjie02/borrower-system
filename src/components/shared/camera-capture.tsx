@@ -105,10 +105,10 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
   if (mode === "idle") {
     return (
       <div className="flex flex-col items-center gap-4 p-6">
-        <div className="rounded-full bg-[#E3F2FD] p-6">
-          <Camera className="h-10 w-10 text-[#1565C0]" />
+        <div className="rounded-full bg-white/8 p-6 ring-1 ring-white/10">
+          <Camera className="h-10 w-10 text-accent" />
         </div>
-        <p className="text-center text-sm text-[#6B7280]">
+        <p className="text-center text-sm text-muted">
           A live photo is required for verification. Your camera will be used — no file uploads.
         </p>
         <Button size="lg" onClick={startCamera} className="w-full max-w-xs">
@@ -127,8 +127,8 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
   if (mode === "error") {
     return (
       <div className="flex flex-col items-center gap-4 p-6">
-        <AlertCircle className="h-10 w-10 text-red-500" />
-        <p className="text-center text-sm text-red-600">{error}</p>
+        <AlertCircle className="h-10 w-10 text-red-400" />
+        <p className="text-center text-sm text-red-300">{error}</p>
         <Button onClick={startCamera}>Try Again</Button>
         {onCancel && <Button variant="ghost" onClick={onCancel}>Cancel</Button>}
       </div>
@@ -142,9 +142,9 @@ export function CameraCapture({ onCapture, onCancel, label = "Take Photo" }: Cam
         <img
           src={capturedUrl}
           alt="Captured photo"
-          className="w-full max-w-sm rounded-xl border-2 border-[#1565C0] object-cover"
+          className="w-full max-w-sm rounded-xl border-2 border-accent object-cover"
         />
-        <p className="text-sm text-[#6B7280]">Confirm this photo or retake</p>
+        <p className="text-sm text-muted">Confirm this photo or retake</p>
         <div className="flex gap-3 w-full max-w-sm">
           <Button variant="outline" onClick={retake} className="flex-1">
             <RotateCcw className="h-4 w-4" />

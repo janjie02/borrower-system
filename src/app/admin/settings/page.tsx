@@ -62,8 +62,8 @@ export default function AdminSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Settings</h1>
-        <p className="text-sm text-[#6B7280]">Configure system-wide preferences</p>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
+        <p className="text-sm text-muted">Configure system-wide preferences</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
@@ -127,7 +127,7 @@ export default function AdminSettingsPage() {
               }
             />
             <div className="space-y-1.5">
-              <label htmlFor="photo-retention" className="text-sm font-medium text-[#1F2937]">
+              <label htmlFor="photo-retention" className="text-sm font-medium text-white">
                 Photo Retention
               </label>
               <select
@@ -140,7 +140,7 @@ export default function AdminSettingsPage() {
                       .value as SystemSettings["photo_retention_days"],
                   })
                 }
-                className="flex h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm"
+                className="flex h-10 w-full rounded-lg border border-white/10 bg-surface px-3 text-sm"
               >
                 <option value="90">90 days</option>
                 <option value="180">180 days</option>
@@ -158,14 +158,14 @@ export default function AdminSettingsPage() {
           <CardContent className="space-y-3">
             {EMAIL_KEYS.map((key) => (
               <label key={key} className="flex items-center justify-between gap-4 text-sm">
-                <span className="capitalize text-[#1F2937]">
+                <span className="capitalize text-white">
                   {key.replace(/_/g, " ")}
                 </span>
                 <input
                   type="checkbox"
                   checked={settings.email_notifications?.[key] ?? false}
                   onChange={(e) => updateEmailNotification(key, e.target.checked)}
-                  className="h-4 w-4 rounded border-[#E5E7EB] text-[#1565C0] focus:ring-[#1565C0]"
+                  className="h-4 w-4 rounded border-white/10 text-accent focus:ring-accent"
                 />
               </label>
             ))}

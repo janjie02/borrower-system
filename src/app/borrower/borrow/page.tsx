@@ -106,17 +106,17 @@ export default function BorrowerBorrowPage() {
   if (step === "success") {
     return (
       <div className="flex flex-col items-center gap-6 py-12 text-center">
-        <div className="rounded-full bg-green-100 p-6">
-          <CheckCircle className="h-12 w-12 text-green-600" />
+        <div className="rounded-full bg-emerald-400/10 p-6">
+          <CheckCircle className="h-12 w-12 text-emerald-300" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Request Submitted!</h1>
+          <h1 className="text-2xl font-bold text-white">Request Submitted!</h1>
           {requestNumber && (
-            <p className="mt-2 text-[#1565C0] font-mono font-semibold">
+            <p className="mt-2 text-accent font-mono font-semibold">
               #{requestNumber}
             </p>
           )}
-          <p className="mt-2 text-sm text-[#6B7280]">
+          <p className="mt-2 text-sm text-muted">
             You&apos;ll receive an email once your request is reviewed.
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function BorrowerBorrowPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-16">
         <LoadingSpinner size="lg" />
-        <p className="text-[#6B7280]">Submitting your request...</p>
+        <p className="text-muted">Submitting your request...</p>
       </div>
     );
   }
@@ -144,8 +144,8 @@ export default function BorrowerBorrowPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Borrow Items</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-white">Borrow Items</h1>
+        <p className="text-sm text-muted">
           {totalItems} item{totalItems !== 1 ? "s" : ""} in cart
         </p>
       </div>
@@ -156,21 +156,21 @@ export default function BorrowerBorrowPage() {
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                 i <= stepIndex
-                  ? "bg-[#1565C0] text-white"
-                  : "bg-[#E5E7EB] text-[#6B7280]"
+                  ? "bg-accent text-[#0D2B66]"
+                  : "bg-white/10 text-muted"
               }`}
             >
               {i + 1}
             </div>
             <span
               className={`text-xs font-medium hidden sm:block ${
-                i <= stepIndex ? "text-[#1565C0]" : "text-[#6B7280]"
+                i <= stepIndex ? "text-accent" : "text-muted"
               }`}
             >
               {s.label}
             </span>
             {i < STEPS.length - 1 && (
-              <ChevronRight className="h-4 w-4 text-[#E5E7EB] shrink-0" />
+              <ChevronRight className="h-4 w-4 text-white/20 shrink-0" />
             )}
           </div>
         ))}
@@ -183,15 +183,15 @@ export default function BorrowerBorrowPage() {
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-[#1F2937] truncate">
+                    <h3 className="font-semibold text-white truncate">
                       {item.name}
                     </h3>
-                    <p className="text-xs text-[#6B7280] font-mono">{item.sku}</p>
+                    <p className="text-xs text-muted font-mono">{item.sku}</p>
                   </div>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-red-500 shrink-0"
+                    className="text-red-300 shrink-0"
                     onClick={() => removeItem(item.inventoryId)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -211,7 +211,7 @@ export default function BorrowerBorrowPage() {
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
-                    <span className="text-lg font-bold text-[#1565C0] w-8 text-center">
+                    <span className="text-lg font-bold text-accent w-8 text-center">
                       {item.quantity}
                     </span>
                     <Button
@@ -226,7 +226,7 @@ export default function BorrowerBorrowPage() {
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  <span className="text-xs text-[#6B7280]">
+                  <span className="text-xs text-muted">
                     max {item.maxQuantity}
                   </span>
                 </div>
@@ -253,7 +253,7 @@ export default function BorrowerBorrowPage() {
         <div className="space-y-4">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-[#6B7280] mb-4 text-center">
+              <p className="text-sm text-muted mb-4 text-center">
                 A live photo is required for identity verification before
                 submitting your request.
               </p>
@@ -274,23 +274,23 @@ export default function BorrowerBorrowPage() {
             <img
               src={photoPreview}
               alt="Verification photo"
-              className="w-full max-w-sm mx-auto rounded-xl border-2 border-[#1565C0] object-cover aspect-[4/3]"
+              className="w-full max-w-sm mx-auto rounded-xl border-2 border-accent object-cover aspect-[4/3]"
             />
           )}
 
           <Card>
             <CardContent className="p-4 space-y-3">
-              <h3 className="font-semibold text-[#1F2937] flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4 text-[#1565C0]" />
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-accent" />
                 Items ({totalItems})
               </h3>
               {items.map((item) => (
                 <div
                   key={item.inventoryId}
-                  className="flex justify-between text-sm border-b border-[#E5E7EB] pb-2 last:border-0"
+                  className="flex justify-between text-sm border-b border-white/10 pb-2 last:border-0"
                 >
-                  <span className="text-[#1F2937]">{item.name}</span>
-                  <span className="font-medium text-[#1565C0]">×{item.quantity}</span>
+                  <span className="text-white">{item.name}</span>
+                  <span className="font-medium text-accent">×{item.quantity}</span>
                 </div>
               ))}
             </CardContent>

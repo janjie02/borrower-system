@@ -113,19 +113,19 @@ export default function AdminRequestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Borrow Requests</h1>
-        <p className="text-sm text-[#6B7280]">Review and manage borrowing requests</p>
+        <h1 className="text-2xl font-bold text-white">Borrow Requests</h1>
+        <p className="text-sm text-muted">Review and manage borrowing requests</p>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-[#E5E7EB] pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-white/10 pb-2">
         {TABS.map((tab) => (
           <button
             key={tab.status}
             onClick={() => setActiveTab(tab.status)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
               activeTab === tab.status
-                ? "bg-[#1565C0] text-white"
-                : "text-[#6B7280] hover:bg-[#E3F2FD] hover:text-[#1565C0]"
+                ? "bg-accent text-[#0D2B66]"
+                : "text-muted hover:bg-white/5 hover:text-accent"
             }`}
           >
             {tab.label}
@@ -165,12 +165,12 @@ export default function AdminRequestsPage() {
                     {req.request_number}
                     <Badge status={req.status} />
                     {req.is_guest && (
-                      <span className="rounded-full bg-[#FFF8D6] px-2 py-0.5 text-xs font-medium text-[#92400E]">
+                      <span className="rounded-full bg-amber-400/10 px-2 py-0.5 text-xs font-medium text-amber-200">
                         Guest
                       </span>
                     )}
                   </CardTitle>
-                  <p className="text-sm text-[#6B7280]">
+                  <p className="text-sm text-muted">
                     {getBorrowerName(req)} · {formatDateTime(req.created_at)}
                   </p>
                 </div>
@@ -208,24 +208,24 @@ export default function AdminRequestsPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {req.borrow_date && (
-                  <p className="text-sm text-[#6B7280]">
+                  <p className="text-sm text-muted">
                     Borrow: {formatDate(req.borrow_date)} · Due: {formatDate(req.due_date)}
                   </p>
                 )}
                 {req.rejection_reason && (
-                  <p className="text-sm text-red-600">Reason: {req.rejection_reason}</p>
+                  <p className="text-sm text-red-200">Reason: {req.rejection_reason}</p>
                 )}
-                {req.notes && <p className="text-sm text-[#6B7280]">Notes: {req.notes}</p>}
-                <ul className="divide-y divide-[#E5E7EB] rounded-lg border border-[#E5E7EB]">
+                {req.notes && <p className="text-sm text-muted">Notes: {req.notes}</p>}
+                <ul className="divide-y divide-white/10 rounded-lg border border-white/10">
                   {(req.borrow_request_items ?? []).map((item) => (
                     <li key={item.id} className="flex justify-between px-4 py-2 text-sm">
                       <span>{item.inventory?.name ?? "Item"}</span>
-                      <span className="text-[#6B7280]">Qty: {item.quantity}</span>
+                      <span className="text-muted">Qty: {item.quantity}</span>
                     </li>
                   ))}
                 </ul>
                 {rejectingId === req.id && (
-                  <div className="space-y-2 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <div className="space-y-2 rounded-lg border border-red-400/30 bg-red-400/10 p-4">
                     <Textarea
                       label="Rejection reason (optional)"
                       value={rejectReason}

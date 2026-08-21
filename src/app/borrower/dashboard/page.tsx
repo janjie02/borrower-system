@@ -23,10 +23,10 @@ export default async function BorrowerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">
+        <h1 className="text-2xl font-bold text-white">
           Hello, {user.full_name.split(" ")[0]}
         </h1>
-        <p className="mt-1 text-sm text-[#6B7280]">
+        <p className="mt-1 text-sm text-muted">
           Here&apos;s your borrowing overview
         </p>
       </div>
@@ -76,15 +76,15 @@ export default async function BorrowerDashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-5 w-5 text-[#1565C0]" />
+              <TrendingUp className="h-5 w-5 text-accent" />
               Most Borrowed Item
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-semibold text-[#1F2937]">
+            <p className="font-semibold text-white">
               {stats.mostBorrowedItem}
             </p>
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-sm text-muted">
               Borrowed {stats.mostBorrowedCount} time
               {stats.mostBorrowedCount !== 1 ? "s" : ""}
             </p>

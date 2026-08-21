@@ -61,13 +61,16 @@ export function BarcodePrintView({
         <p className="text-xs mt-1">{sku}</p>
       </div>
       <div className="print:hidden">
-        <div className="rounded-xl border border-[#E5E7EB] p-6 text-center bg-white">
-          <p className="font-semibold text-[#1F2937] mb-2">{name}</p>
-          <BarcodeDisplay value={barcode} className="mx-auto" />
-          <p className="text-sm text-[#6B7280] mt-2">{sku}</p>
+        <div className="rounded-2xl border border-white/10 p-4 text-center bg-surface">
+          <p className="text-xs font-medium text-muted mb-3">Scannable label</p>
+          <div className="rounded-xl bg-white p-4">
+            <p className="font-semibold text-[#1F2937] mb-2">{name}</p>
+            <BarcodeDisplay value={barcode} className="mx-auto" />
+            <p className="text-sm text-[#6B7280] mt-2">{sku}</p>
+          </div>
           <button
             onClick={handlePrint}
-            className="mt-4 text-sm text-[#1565C0] hover:underline cursor-pointer"
+            className="mt-4 text-sm font-medium text-accent hover:underline cursor-pointer"
           >
             Print Label
           </button>

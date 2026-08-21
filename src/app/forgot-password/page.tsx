@@ -48,19 +48,19 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+    <div className="flex min-h-screen flex-col app-bg">
       <PublicHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#1565C0] text-white">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-[#0D2B66] shadow-lg shadow-black/30">
               {success ? (
                 <CheckCircle2 className="h-7 w-7" />
               ) : (
                 <Mail className="h-7 w-7" />
               )}
             </div>
-            <CardTitle className="text-2xl text-[#1565C0]">
+            <CardTitle className="text-2xl">
               {success ? "Check Your Email" : "Reset Password"}
             </CardTitle>
             <CardDescription>
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
           <CardContent>
             {success ? (
               <div className="space-y-6">
-                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
                   A password reset link has been sent to <strong>{email}</strong>. The link
                   expires after a short time for security.
                 </div>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
                     {error}
                   </div>
                 )}

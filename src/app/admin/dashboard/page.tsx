@@ -28,7 +28,15 @@ import { StatCard, LoadingSpinner } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const PIE_COLORS = ["#1565C0", "#FBC02D", "#EF4444", "#9CA3AF"];
+const PIE_COLORS = ["#FBC02D", "#2F6FE0", "#EF4444", "#9DB8E3"];
+const AXIS_TICK = { fontSize: 11, fill: "#9DB8E3" };
+const GRID_STROKE = "rgba(255,255,255,0.12)";
+const TOOLTIP_STYLE = {
+  backgroundColor: "#0E2E63",
+  border: "1px solid rgba(255,255,255,0.15)",
+  borderRadius: "12px",
+  color: "#fff",
+} as const;
 const CHART_DAYS_OPTIONS = [7, 30, 90];
 
 type Stats = Awaited<ReturnType<typeof getAdminDashboardStats>>;
@@ -89,8 +97,8 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
-          <p className="text-sm text-[#6B7280]">Overview of borrowing system activity</p>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <p className="text-sm text-muted">Overview of borrowing system activity</p>
         </div>
         <div className="flex flex-wrap items-end gap-3">
           <Input
@@ -161,44 +169,44 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-[#E5E7EB] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Borrowing Activity</h2>
+        <div className="rounded-xl border border-white/10 bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-white">Borrowing Activity</h2>
           {borrowingActivity.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[#6B7280]">No activity in this period</p>
+            <p className="py-8 text-center text-sm text-muted">No activity in this period</p>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={borrowingActivity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#1565C0" strokeWidth={2} dot={{ r: 3 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                <XAxis dataKey="date" tick={AXIS_TICK} stroke={GRID_STROKE} />
+                <YAxis allowDecimals={false} tick={AXIS_TICK} stroke={GRID_STROKE} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: "rgba(255,255,255,0.2)" }} />
+                <Line type="monotone" dataKey="count" stroke="#FBC02D" strokeWidth={2.5} dot={{ r: 3, fill: "#FBC02D" }} />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        <div className="rounded-xl border border-[#E5E7EB] bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Most Borrowed Items</h2>
+        <div className="rounded-xl border border-white/10 bg-surface p-6">
+          <h2 className="mb-4 text-lg font-semibold text-white">Most Borrowed Items</h2>
           {mostBorrowed.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[#6B7280]">No borrowing data yet</p>
+            <p className="py-8 text-center text-sm text-muted">No borrowing data yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={mostBorrowed.slice(0, 8)} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10 }} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#1565C0" radius={[0, 4, 4, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                <XAxis type="number" allowDecimals={false} tick={AXIS_TICK} stroke={GRID_STROKE} />
+                <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 10, fill: "#9DB8E3" }} stroke={GRID_STROKE} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
+                <Bar dataKey="count" fill="#FBC02D" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        <div className="rounded-xl border border-[#E5E7EB] bg-white p-6 lg:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Inventory Breakdown</h2>
+        <div className="rounded-xl border border-white/10 bg-surface p-6 lg:col-span-2">
+          <h2 className="mb-4 text-lg font-semibold text-white">Inventory Breakdown</h2>
           {inventoryBreakdown.every((i) => i.value === 0) ? (
-            <p className="py-8 text-center text-sm text-[#6B7280]">No inventory data</p>
+            <p className="py-8 text-center text-sm text-muted">No inventory data</p>
           ) : (
             <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
               <ResponsiveContainer width="100%" height={260}>
@@ -213,10 +221,10 @@ export default function AdminDashboardPage() {
                     label={({ name, value }) => `${name}: ${value}`}
                   >
                     {inventoryBreakdown.map((_, index) => (
-                      <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="#0E2E63" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-2">
@@ -226,8 +234,8 @@ export default function AdminDashboardPage() {
                       className="h-3 w-3 rounded-full"
                       style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}
                     />
-                    <span className="text-[#6B7280]">{item.name}</span>
-                    <span className="font-semibold text-[#1F2937]">{item.value}</span>
+                    <span className="text-muted">{item.name}</span>
+                    <span className="font-semibold text-white">{item.value}</span>
                   </div>
                 ))}
               </div>

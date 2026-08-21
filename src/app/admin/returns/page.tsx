@@ -89,8 +89,8 @@ export default function AdminReturnsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Process Returns</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-white">Process Returns</h1>
+        <p className="text-sm text-muted">
           Scan or enter barcodes to process item returns
         </p>
       </div>
@@ -116,11 +116,11 @@ export default function AdminReturnsPage() {
                   <CardTitle className="flex flex-wrap items-center gap-2 text-base">
                     {req.request_number}
                     <Badge status={req.status} />
-                    <span className="text-sm font-normal text-[#6B7280]">
+                    <span className="text-sm font-normal text-muted">
                       {getBorrowerName(req)}
                     </span>
                   </CardTitle>
-                  <p className="text-sm text-[#6B7280]">
+                  <p className="text-sm text-muted">
                     Due: {formatDate(req.due_date)}
                   </p>
                 </CardHeader>
@@ -130,30 +130,30 @@ export default function AdminReturnsPage() {
                     return (
                       <div
                         key={item.id}
-                        className="rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-4 space-y-3"
+                        className="rounded-lg border border-white/10 bg-white/5 p-4 space-y-3"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <p className="font-medium text-[#1F2937]">
+                            <p className="font-medium text-white">
                               {item.inventory?.name ?? "Item"}
                             </p>
-                            <p className="font-mono text-xs text-[#6B7280]">
+                            <p className="font-mono text-xs text-muted">
                               {item.inventory?.sku} · {item.inventory?.barcode}
                             </p>
                           </div>
-                          <span className="text-sm text-[#6B7280]">Qty: {item.quantity}</span>
+                          <span className="text-sm text-muted">Qty: {item.quantity}</span>
                         </div>
 
                         <div className="grid gap-3 sm:grid-cols-2">
                           <div className="relative">
-                            <ScanLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                            <ScanLine className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                             <input
                               placeholder="Scan or enter barcode..."
                               value={barcodes[key] ?? ""}
                               onChange={(e) =>
                                 setBarcodes((prev) => ({ ...prev, [key]: e.target.value }))
                               }
-                              className="flex h-10 w-full rounded-lg border border-[#E5E7EB] bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+                              className="flex h-10 w-full rounded-lg border border-white/10 bg-surface pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
                             />
                           </div>
                           <select
@@ -164,7 +164,7 @@ export default function AdminReturnsPage() {
                                 [key]: e.target.value as ReturnCondition,
                               }))
                             }
-                            className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+                            className="h-10 rounded-lg border border-white/10 bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
                           >
                             {CONDITIONS.map((c) => (
                               <option key={c.value} value={c.value}>

@@ -63,8 +63,8 @@ export default async function BorrowerProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">My Profile</h1>
-        <p className="text-sm text-[#6B7280]">{user.email}</p>
+        <h1 className="text-2xl font-bold text-white">My Profile</h1>
+        <p className="text-sm text-muted">{user.email}</p>
       </div>
 
       <div
@@ -83,7 +83,7 @@ export default async function BorrowerProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <User className="h-5 w-5 text-[#1565C0]" />
+            <User className="h-5 w-5 text-accent" />
             Account Details
           </CardTitle>
         </CardHeader>
@@ -119,10 +119,10 @@ export default async function BorrowerProfilePage() {
                 className="opacity-60"
               />
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#1F2937]">
+                <label className="text-sm font-medium text-white">
                   Account Type
                 </label>
-                <p className="flex h-10 items-center rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-3 text-sm capitalize text-[#6B7280]">
+                <p className="flex h-10 items-center rounded-lg border border-white/10 bg-white/5 px-3 text-sm capitalize text-muted">
                   {profile?.account_type ?? "student"}
                 </p>
               </div>
@@ -161,18 +161,18 @@ export default async function BorrowerProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Phone className="h-5 w-5 text-[#1565C0]" />
+            <Phone className="h-5 w-5 text-accent" />
             Account Status
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[#6B7280]">Status</span>
+            <span className="text-sm text-muted">Status</span>
             <Badge status={user.account_status === "active" ? "active" : "pending"} />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[#6B7280]">Member since</span>
-            <span className="text-sm font-medium text-[#1F2937]">
+            <span className="text-sm text-muted">Member since</span>
+            <span className="text-sm font-medium text-white">
               {formatDateTime(user.created_at)}
             </span>
           </div>
@@ -185,7 +185,7 @@ export default async function BorrowerProfilePage() {
         </CardHeader>
         <CardContent>
           {!history.length ? (
-            <p className="text-sm text-[#6B7280] text-center py-6">
+            <p className="text-sm text-muted text-center py-6">
               No credit changes yet. Return items on time to build your score.
             </p>
           ) : (
@@ -193,16 +193,16 @@ export default async function BorrowerProfilePage() {
               {history.map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-start justify-between gap-3 border-b border-[#E5E7EB] pb-3 last:border-0"
+                  className="flex items-start justify-between gap-3 border-b border-white/10 pb-3 last:border-0"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1F2937]">
+                    <p className="text-sm font-medium text-white">
                       {capitalize(entry.transaction_type)}
                     </p>
-                    <p className="text-xs text-[#6B7280] mt-0.5 line-clamp-2">
+                    <p className="text-xs text-muted mt-0.5 line-clamp-2">
                       {entry.behavior}
                     </p>
-                    <p className="text-xs text-[#6B7280] mt-1">
+                    <p className="text-xs text-muted mt-1">
                       {formatDateTime(entry.created_at)}
                     </p>
                   </div>
@@ -210,8 +210,8 @@ export default async function BorrowerProfilePage() {
                     <p
                       className={`flex items-center gap-1 text-sm font-bold ${
                         entry.credit_change >= 0
-                          ? "text-green-600"
-                          : "text-red-600"
+                          ? "text-emerald-300"
+                          : "text-red-300"
                       }`}
                     >
                       {entry.credit_change >= 0 ? (
@@ -222,7 +222,7 @@ export default async function BorrowerProfilePage() {
                       {entry.credit_change >= 0 ? "+" : ""}
                       {entry.credit_change}
                     </p>
-                    <p className="text-xs text-[#6B7280]">
+                    <p className="text-xs text-muted">
                       Score: {entry.new_score}
                     </p>
                   </div>

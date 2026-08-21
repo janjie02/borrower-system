@@ -20,7 +20,7 @@ export default async function AdminInventoryPage({
 
   if ("error" in result && result.error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+      <div className="rounded-xl border border-red-400/30 bg-red-400/10 p-6 text-red-200">
         {result.error}
       </div>
     );
@@ -34,8 +34,8 @@ export default async function AdminInventoryPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Inventory</h1>
-          <p className="text-sm text-[#6B7280]">{total} items total</p>
+          <h1 className="text-2xl font-bold text-white">Inventory</h1>
+          <p className="text-sm text-muted">{total} items total</p>
         </div>
         <Button asChild>
           <Link href="/admin/inventory/new">
@@ -47,18 +47,18 @@ export default async function AdminInventoryPage({
 
       <form method="GET" className="flex flex-wrap gap-3">
         <div className="relative min-w-[200px] flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             name="search"
             defaultValue={search}
             placeholder="Search by name, SKU, or barcode..."
-            className="flex h-10 w-full rounded-lg border border-[#E5E7EB] bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+            className="flex h-10 w-full rounded-lg border border-white/10 bg-surface pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
         <select
           name="status"
           defaultValue={status}
-          className="h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+          className="h-10 rounded-lg border border-white/10 bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">All Status</option>
           <option value="available">Available</option>
@@ -84,32 +84,32 @@ export default async function AdminInventoryPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-surface">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
+              <thead className="border-b border-white/10 bg-white/5">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">SKU</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Category</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Available</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Total</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Added</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Name</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">SKU</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Category</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Available</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Total</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Added</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E7EB]">
+              <tbody className="divide-y divide-white/10">
                 {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#F9FAFB]">
+                  <tr key={item.id} className="hover:bg-white/5">
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/inventory/${item.id}`}
-                        className="font-medium text-[#1565C0] hover:underline"
+                        className="font-medium text-accent hover:underline"
                       >
                         {item.name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#6B7280]">{item.sku}</td>
-                    <td className="px-4 py-3 text-[#6B7280]">
+                    <td className="px-4 py-3 font-mono text-xs text-muted">{item.sku}</td>
+                    <td className="px-4 py-3 text-muted">
                       {item.inventory_categories?.name ?? "—"}
                     </td>
                     <td className="px-4 py-3">{item.quantity_available}</td>
@@ -117,7 +117,7 @@ export default async function AdminInventoryPage({
                     <td className="px-4 py-3">
                       <Badge status={item.status} />
                     </td>
-                    <td className="px-4 py-3 text-[#6B7280]">{formatDate(item.created_at)}</td>
+                    <td className="px-4 py-3 text-muted">{formatDate(item.created_at)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -135,7 +135,7 @@ export default async function AdminInventoryPage({
                   </Link>
                 </Button>
               )}
-              <span className="text-sm text-[#6B7280]">
+              <span className="text-sm text-muted">
                 Page {page} of {totalPages}
               </span>
               {page < totalPages && (

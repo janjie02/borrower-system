@@ -55,12 +55,12 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+    <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#1565C0] text-white">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-[#0D2B66] shadow-lg shadow-black/30">
           <LogIn className="h-7 w-7" />
         </div>
-        <CardTitle className="text-2xl text-[#1565C0]">Sign In</CardTitle>
+        <CardTitle className="text-2xl">Sign In</CardTitle>
         <CardDescription>
           Enter your credentials to access your dashboard
         </CardDescription>
@@ -68,7 +68,7 @@ function LoginForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -98,7 +98,7 @@ function LoginForm() {
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-sm font-medium text-[#1565C0] hover:underline"
+              className="text-sm font-medium text-accent hover:underline"
             >
               Forgot password?
             </Link>
@@ -116,9 +116,9 @@ function LoginForm() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[#6B7280]">
+        <p className="mt-6 text-center text-sm text-muted">
           Need to borrow items?{" "}
-          <Link href="/borrow" className="font-medium text-[#1565C0] hover:underline">
+          <Link href="/borrow" className="font-medium text-accent hover:underline">
             Go to borrow page
           </Link>
         </p>
@@ -129,9 +129,9 @@ function LoginForm() {
 
 function LoginFallback() {
   return (
-    <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+    <Card className="w-full max-w-md">
       <CardContent className="flex items-center justify-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1565C0]" />
+        <Loader2 className="h-8 w-8 animate-spin text-accent" />
       </CardContent>
     </Card>
   );
@@ -139,7 +139,7 @@ function LoginFallback() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+    <div className="flex min-h-screen flex-col app-bg">
       <PublicHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <Suspense fallback={<LoginFallback />}>

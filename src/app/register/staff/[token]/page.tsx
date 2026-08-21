@@ -101,13 +101,13 @@ export default function StaffRegisterPage() {
 
   if (validating) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+      <div className="flex min-h-screen flex-col app-bg">
         <PublicHeader />
         <main className="flex flex-1 items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+          <Card className="w-full max-w-md">
             <CardContent className="flex flex-col items-center justify-center gap-3 py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-[#1565C0]" />
-              <p className="text-sm text-[#6B7280]">Validating invitation...</p>
+              <Loader2 className="h-8 w-8 animate-spin text-accent" />
+              <p className="text-sm text-muted">Validating invitation...</p>
             </CardContent>
           </Card>
         </main>
@@ -117,12 +117,12 @@ export default function StaffRegisterPage() {
 
   if (validationError) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+      <div className="flex min-h-screen flex-col app-bg">
         <PublicHeader />
         <main className="flex flex-1 items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+          <Card className="w-full max-w-md">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl text-red-600">Invalid Invitation</CardTitle>
+              <CardTitle className="text-xl text-red-300">Invalid Invitation</CardTitle>
               <CardDescription>{validationError}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -141,19 +141,19 @@ export default function StaffRegisterPage() {
     : "Staff";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+    <div className="flex min-h-screen flex-col app-bg">
       <PublicHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
-        <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#1565C0] text-white">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-[#0D2B66] shadow-lg shadow-black/30">
               {success ? (
                 <CheckCircle2 className="h-7 w-7" />
               ) : (
                 <UserCog className="h-7 w-7" />
               )}
             </div>
-            <CardTitle className="text-2xl text-[#1565C0]">
+            <CardTitle className="text-2xl">
               {success ? "Account Ready" : "Staff Registration"}
             </CardTitle>
             <CardDescription>
@@ -167,7 +167,7 @@ export default function StaffRegisterPage() {
           <CardContent>
             {success ? (
               <div className="space-y-4 text-center">
-                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
                   You can now sign in to access the admin dashboard.
                 </div>
                 <Button asChild className="w-full">
@@ -177,17 +177,17 @@ export default function StaffRegisterPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
                     {error}
                   </div>
                 )}
 
                 {invitation?.staff_role && (
-                  <div className="flex items-center gap-3 rounded-lg border border-[#FBC02D] bg-[#FFF8D6] px-4 py-3">
-                    <Briefcase className="h-5 w-5 shrink-0 text-[#1565C0]" />
+                  <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-4 py-3">
+                    <Briefcase className="h-5 w-5 shrink-0 text-accent" />
                     <div>
-                      <p className="text-sm font-medium text-[#1F2937]">Assigned Role</p>
-                      <p className="text-sm text-[#6B7280]">{staffRoleLabel}</p>
+                      <p className="text-sm font-medium text-white">Assigned Role</p>
+                      <p className="text-sm text-muted">{staffRoleLabel}</p>
                     </div>
                   </div>
                 )}
@@ -207,7 +207,7 @@ export default function StaffRegisterPage() {
                   value={email}
                   readOnly
                   disabled
-                  className="bg-[#F9FAFB]"
+                  className="opacity-70"
                 />
 
                 <Input

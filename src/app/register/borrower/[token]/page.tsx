@@ -112,13 +112,13 @@ export default function BorrowerRegisterPage() {
 
   if (validating) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+      <div className="flex min-h-screen flex-col app-bg">
         <PublicHeader />
         <main className="flex flex-1 items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+          <Card className="w-full max-w-md">
             <CardContent className="flex flex-col items-center justify-center gap-3 py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-[#1565C0]" />
-              <p className="text-sm text-[#6B7280]">Validating invitation...</p>
+              <Loader2 className="h-8 w-8 animate-spin text-accent" />
+              <p className="text-sm text-muted">Validating invitation...</p>
             </CardContent>
           </Card>
         </main>
@@ -128,12 +128,12 @@ export default function BorrowerRegisterPage() {
 
   if (validationError) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+      <div className="flex min-h-screen flex-col app-bg">
         <PublicHeader />
         <main className="flex flex-1 items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md border-[#E5E7EB] shadow-lg">
+          <Card className="w-full max-w-md">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl text-red-600">Invalid Invitation</CardTitle>
+              <CardTitle className="text-xl text-red-300">Invalid Invitation</CardTitle>
               <CardDescription>{validationError}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -148,19 +148,19 @@ export default function BorrowerRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#E3F2FD]">
+    <div className="flex min-h-screen flex-col app-bg">
       <PublicHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
-        <Card className="w-full max-w-lg border-[#E5E7EB] shadow-lg">
+        <Card className="w-full max-w-lg">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#1565C0] text-white">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-[#0D2B66] shadow-lg shadow-black/30">
               {success ? (
                 <CheckCircle2 className="h-7 w-7" />
               ) : (
                 <UserPlus className="h-7 w-7" />
               )}
             </div>
-            <CardTitle className="text-2xl text-[#1565C0]">
+            <CardTitle className="text-2xl">
               {success ? "Welcome!" : "Borrower Registration"}
             </CardTitle>
             <CardDescription>
@@ -174,7 +174,7 @@ export default function BorrowerRegisterPage() {
           <CardContent>
             {success ? (
               <div className="space-y-4 text-center">
-                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
                   You can now sign in and start browsing inventory.
                 </div>
                 <Button asChild className="w-full">
@@ -184,23 +184,23 @@ export default function BorrowerRegisterPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
                     {error}
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[#1F2937]">Account Type</p>
+                  <p className="text-sm font-medium text-muted-strong">Account Type</p>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setAccountType("student")}
                       disabled={loading}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors cursor-pointer",
+                        "flex flex-col items-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-colors cursor-pointer",
                         accountType === "student"
-                          ? "border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]"
-                          : "border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#1565C0]/50"
+                          ? "border-accent bg-accent-soft text-accent"
+                          : "border-white/12 bg-surface-2 text-muted hover:border-white/25"
                       )}
                     >
                       <GraduationCap className="h-5 w-5" />
@@ -211,10 +211,10 @@ export default function BorrowerRegisterPage() {
                       onClick={() => setAccountType("teacher")}
                       disabled={loading}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors cursor-pointer",
+                        "flex flex-col items-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-colors cursor-pointer",
                         accountType === "teacher"
-                          ? "border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]"
-                          : "border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#1565C0]/50"
+                          ? "border-accent bg-accent-soft text-accent"
+                          : "border-white/12 bg-surface-2 text-muted hover:border-white/25"
                       )}
                     >
                       <UserPlus className="h-5 w-5" />
@@ -238,7 +238,7 @@ export default function BorrowerRegisterPage() {
                   value={email}
                   readOnly
                   disabled
-                  className="bg-[#F9FAFB]"
+                  className="opacity-70"
                 />
 
                 <Input

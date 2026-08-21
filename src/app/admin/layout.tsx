@@ -23,10 +23,10 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen app-bg">
       <AdminSidebar role={user.role} userName={user.full_name || user.email} />
       <main className="min-h-screen lg:pl-64">
-        <div className="p-6 pt-16 lg:p-8 lg:pt-8">{children}</div>
+        <div className="mx-auto max-w-7xl p-5 pt-16 lg:p-8 lg:pt-8">{children}</div>
       </main>
     </div>
   );

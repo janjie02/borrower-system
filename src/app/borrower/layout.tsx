@@ -24,7 +24,7 @@ export default async function BorrowerLayout({
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-[#F9FAFB]">
+      <div className="min-h-screen app-bg">
         <BorrowerNav userName={user.full_name} />
         <main className="mx-auto max-w-lg px-4 pb-24 pt-4">{children}</main>
       </div>

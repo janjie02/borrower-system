@@ -19,7 +19,7 @@ export default async function AdminActivityPage({
 
   if ("error" in result && result.error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+      <div className="rounded-xl border border-red-400/30 bg-red-400/10 p-6 text-red-200">
         {result.error}
       </div>
     );
@@ -32,18 +32,18 @@ export default async function AdminActivityPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#1F2937]">Activity Log</h1>
-        <p className="text-sm text-[#6B7280]">{total} recorded events</p>
+        <h1 className="text-2xl font-bold text-white">Activity Log</h1>
+        <p className="text-sm text-muted">{total} recorded events</p>
       </div>
 
       <form method="GET" className="flex gap-3">
         <div className="relative min-w-[200px] flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             name="search"
             defaultValue={search}
             placeholder="Search by action, email, or target..."
-            className="flex h-10 w-full rounded-lg border border-[#E5E7EB] bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565C0]"
+            className="flex h-10 w-full rounded-lg border border-white/10 bg-surface pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
         <Button type="submit" variant="secondary">
@@ -55,31 +55,31 @@ export default async function AdminActivityPage({
         <EmptyState title="No activity found" description="Try a different search term." />
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-surface">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
+              <thead className="border-b border-white/10 bg-white/5">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Timestamp</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Actor</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Action</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6B7280]">Target</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Timestamp</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Actor</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Action</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted">Target</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E7EB]">
+              <tbody className="divide-y divide-white/10">
                 {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-[#F9FAFB]">
-                    <td className="px-4 py-3 whitespace-nowrap text-[#6B7280]">
+                  <tr key={log.id} className="hover:bg-white/5">
+                    <td className="px-4 py-3 whitespace-nowrap text-muted">
                       {formatDateTime(log.created_at)}
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#1F2937]">{log.actor_email ?? "System"}</p>
+                      <p className="font-medium text-white">{log.actor_email ?? "System"}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-[#E3F2FD] px-2.5 py-0.5 text-xs font-medium text-[#1565C0]">
+                      <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent">
                         {capitalize(log.action.replace(/\./g, " "))}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[#6B7280]">
+                    <td className="px-4 py-3 text-muted">
                       {log.target_type && (
                         <span className="text-xs uppercase tracking-wide">{log.target_type}</span>
                       )}
@@ -102,7 +102,7 @@ export default async function AdminActivityPage({
                   </Link>
                 </Button>
               )}
-              <span className="text-sm text-[#6B7280]">
+              <span className="text-sm text-muted">
                 Page {page} of {totalPages}
               </span>
               {page < totalPages && (
