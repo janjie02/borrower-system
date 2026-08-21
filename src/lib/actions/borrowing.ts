@@ -530,7 +530,7 @@ export async function getBorrowRequests(filters?: {
     .from("borrow_requests")
     .select(
       `*, borrow_request_items(*, inventory(name, sku, barcode)),
-       borrower_profiles(*, profiles(full_name, email)),
+       profiles!borrower_id(full_name, email, borrower_profiles(*)),
        guest_profiles(*)`,
       { count: "exact" }
     )

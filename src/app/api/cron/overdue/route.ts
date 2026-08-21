@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     .select(`
       request_number, due_date, borrower_id, guest_profile_id,
       borrow_request_items(inventory(name)),
-      borrower_profiles(profiles(email)),
+      profiles!borrower_id(email),
       guest_profiles(email)
     `)
     .eq("status", "active")
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
   for (const req of dueSoon ?? []) {
     const email =
-      (req.borrower_profiles as unknown as { profiles: { email: string } } | null)?.profiles?.email ??
+      (req.profiles as unknown as { email: string } | null)?.email ??
       (req.guest_profiles as unknown as { email: string } | null)?.email;
     if (!email) continue;
     const items = ((req.borrow_request_items as unknown as { inventory: { name: string } }[]) ?? [])
@@ -49,14 +49,14 @@ export async function GET(request: NextRequest) {
     .select(`
       request_number, due_date, borrower_id,
       borrow_request_items(inventory(name)),
-      borrower_profiles(profiles(email)),
+      profiles!borrower_id(email),
       guest_profiles(email)
     `)
     .eq("status", "overdue");
 
   for (const req of overdueRequests ?? []) {
     const email =
-      (req.borrower_profiles as unknown as { profiles: { email: string } } | null)?.profiles?.email ??
+      (req.profiles as unknown as { email: string } | null)?.email ??
       (req.guest_profiles as unknown as { email: string } | null)?.email;
     if (!email) continue;
     const daysOverdue = Math.ceil(

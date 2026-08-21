@@ -118,6 +118,7 @@ export interface BorrowRequest {
   created_at: string;
   updated_at: string;
   borrower_profiles?: BorrowerProfile & { profiles?: Profile };
+  profiles?: Profile & { borrower_profiles?: BorrowerProfile | BorrowerProfile[] };
   guest_profiles?: GuestProfile;
   borrow_request_items?: BorrowRequestItem[];
 }

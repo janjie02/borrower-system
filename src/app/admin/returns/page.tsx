@@ -52,7 +52,7 @@ export default function AdminReturnsPage() {
 
   const getBorrowerName = (req: BorrowRequest) => {
     if (req.is_guest && req.guest_profiles) return req.guest_profiles.full_name;
-    return req.borrower_profiles?.profiles?.full_name ?? "Unknown";
+    return req.profiles?.full_name ?? req.borrower_profiles?.profiles?.full_name ?? "Unknown";
   };
 
   const handleProcessReturn = async (
